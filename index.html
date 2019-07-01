@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Desta Movies</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" tyle="stylesheet/css" />
+
+    <!-- Vue-->
+    <script src="https://unpkg.com/vue"></script>
+
+    <!-- Bootstrap & FontAwesome-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-end">
+        <a class="navbar-brand" href="#">
+            <img src="http://icons.iconarchive.com/icons/hadezign/hobbies/256/Movies-icon.png"
+                class="d-inline-block align-top" alt="Logo" />
+            Desta Movies
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
+            <ul class="navbar-nav text-right">
+                <li class="nav-item active">
+                    <a class="nav-link" href="https://linkedin.com/in/liordesta" target="_blank"><i class="fa fa-linkedin-square"
+                            style="font-size:32px;"></i></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="https://github.com/liordesta" target="_blank"><i class="fa fa-github-square"
+                            style="font-size:32px;"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Vue app-->
+    <div id="app" class="row" style="margin-left: 100px;">
+        <input name="search" id="search" v-model="searchQuery" type="text" class="form-control" placeholder="Search for a movie...">
+        <div class="card col-lg-3 col-sm-6" style="width: 23rem;" v-for="(movie, index) in movieResources">
+            <div class="card-header" style="white-space: nowrap;text-align:center;">
+                <h5>{{movie.title}} {{movie.year}}</h5>
+            </div>
+            <img class="card-img-top" :src="movie.poster" alt="Poster">
+            <div class="card-body">
+                <div class="tags">
+                    <span class="cate" v-for="genre in movie.category">{{genre}}</span>
+                </div>
+                <button class="btn btn-primary" data-backdrop="static" data-keyboard="false" data-toggle="modal"
+                data-target="#trailerModal" @click="playTrailer(index)"><i class="fa fa-play"
+                    style="font-size:15px;"></i></button>
+            <button class="btn btn-primary" @click="deleteMovie(index)"><i class="fa fa-close"
+                    style="font-size:15px;"></i></button>
+                <p class="card-text">{{movie.description}}</p>
+            </div>
+        </div>
+        <transition name="modal">
+            <div class="modal fade" tabindex="-1" role="dialog" id="trailerModal" v-if="showModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width:1000px;right:50%;">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{trailerTitle}}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                @click="closePlayer()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <iframe width="100%" height="550" :src="trailerLink">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="fafa">
+            <a href="https://linkedin.com/in/liordesta" target="_blank"><i class="fa fa-linkedin"
+                    style="font-size:20px;color:white"></i></a>
+            <a href="mailto:liord013@gmail.com"><i class="fa fa-envelope" style="font-size:20px;color:white"></i></a>
+            <a href="tel:+9720546104149"><i class="fa fa-phone" style="font-size:20px;color:white"></i></a>
+            <p>Made by Lior Desta</p>
+        </div>
+    </footer>
+
+    <!-- Vue script -->
+    <script>
+        const movieData = [
+            {
+                title: 'Avengers: Endgame',
+                year: '(2019)',
+                category: ['Action', 'Adventure', 'Sci-Fi'],
+                description: "After the devastating events of Avengers: Infinity War (2018), the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos' actions and restore balance to the universe.",
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_SY1000_CR0,0,674,1000_AL_.jpg',
+                trailerId: 'TcMBFSGVi1c'
+            },
+
+            {
+                title: 'Fight Club',
+                year: '(1999)',
+                category: ['Drama'],
+                description: 'An insomniac office worker and a devil-may-care soapmaker form an underground fight club that evolves into something much, much more.',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjJmYTNkNmItYjYyZC00MGUxLWJhNWMtZDY4Nzc1MDAwMzU5XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,676,1000_AL_.jpg',
+                trailerId: 'SUXWAEX2jlg'
+            },
+
+            {
+                title: 'The Matrix',
+                year: '(1999)',
+                category: ['Action', 'Sci-Fi'],
+                description: 'A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.',
+                poster: 'A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SY1000_CR0,0,665,1000_AL_.jpg',
+                trailerId: 'm8e-FF8MsqU'
+            },
+
+            {
+                title: 'The Dark Knight',
+                year: '(2008)',
+                category: ['Action', 'Crime', 'Drama'],
+                description: 'When the menace known as The Joker emerges from his mysterious past, he wreaks havoc and chaos on the people of Gotham. The Dark Knight must accept one of the greatest psychological and physical tests of his ability to fight injustice.',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_SY1000_CR0,0,675,1000_AL_.jpg',
+                trailerId: 'EXeTwQWrcwY'
+            },
+
+            {
+                title: 'One Piece: Stampede',
+                year: '(2019)',
+                category: ['Animation', 'Action', 'Adventure'],
+                description: 'The movie takes place during the Pirates Expo, "made by pirates, for pirates", where pirates all over the world, including some of its most infamous ones, join in for a big treasure hunt to find a lost treasure, this time the treasure belonged to none other than Gold Roger!',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjNlZDIwYzUtY2UwNS00NjA4LWEyYjEtYWQyZmZjMzU3MWE1XkEyXkFqcGdeQXVyNDQxNjcxNQ@@._V1_SY1000_CR0,0,706,1000_AL_.jpg',
+                trailerId: 'S8_YwFLCh4U'
+            },
+
+            {
+                title: 'Black Panther',
+                year: '(2018)',
+                category: ['Action', 'Adventure', 'Sci-Fi'],
+                description: "T'Challa, heir to the hidden but advanced kingdom of Wakanda, must step forward to lead his people into a new future and must confront a challenger from his country's past.",
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTg1MTY2MjYzNV5BMl5BanBnXkFtZTgwMTc4NTMwNDI@._V1_SY1000_CR0,0,674,1000_AL_.jpg',
+                trailerId: 'xjDjIWPwcPU'
+            },
+
+            {
+                title: 'The Lion King',
+                year: '(2019)',
+                category: ['Animation', 'Adventure', 'Drama'],
+                description: 'After the murder of his father, a young lion prince flees his kingdom only to learn the true meaning of responsibility and bravery.',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjIwMjE1Nzc4NV5BMl5BanBnXkFtZTgwNDg4OTA1NzM@._V1_SY1000_CR0,0,674,1000_AL_.jpg',
+                trailerId: '7TavVZMewpY'
+            },
+
+            {
+                title: 'The Godfather',
+                year: '(1972)',
+                category: ['Action', 'Adventure', 'Sci-Fi'],
+                description: 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.',
+                poster: 'https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,704,1000_AL_.jpg',
+                trailerId: 'sY1S34973zA'
+            },
+        ];
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                movieDB: movieData,
+                showModal: false,
+                trailerLink: null,
+                trailerTitle: null,
+                searchQuery: ''
+            },
+            computed: {
+                movieResources() {
+                    if (this.searchQuery) {
+                        return this.movieDB.filter((item) => {
+                            return item.title.toLowerCase().startsWith(this.searchQuery.trim().toLowerCase());
+                        })
+                    } else {
+                        return this.movieDB;
+                    }
+                }
+            },
+            methods: {
+                playTrailer(index) {
+                    this.showModal = !this.showModal;
+                    this.trailerLink = `https://www.youtube.com/embed/${this.movieDB[index].trailerId}`;
+                    this.trailerTitle = this.movieDB[index].title;
+                },
+                deleteMovie(index) {
+                    this.movieDB.splice(index, 1)
+                },
+                closePlayer() {
+                    this.showModal = !this.showModal;
+                    this.trailerLink = null;
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
